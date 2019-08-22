@@ -1,0 +1,121 @@
+<html>
+<header>
+  <style type="text/css">
+    h2,
+label {
+    font: 2rem 'Fira Sans', sans-serif;
+}
+
+input {
+    margin: .5rem;
+}
+  </style>
+</header>
+<body>
+  
+  <div id="app">
+    <h1>{{ quiz.title }}</h1>
+   
+    <div v-for="(question, index) in quiz.questions">
+      <!-- Hide all questions, show only the one with index === to current question index -->
+      <div v-show="index === questionIndex">
+        <h2>{{ question.text }}</h2>
+        <ol>
+          <li v-for="response in question.responses">
+            <label>
+            
+                <input type="radio" 
+                     v-bind:value="response.correct" 
+                     v-bind:name="index" 
+                     v-model="userResponses[index]"> {{response.text}}
+            </label>
+          </li>
+        </ol>
+        <button v-if="questionIndex > 0" v-on:click="prev">
+          prev
+        </button>
+        <button v-on:click="next">
+          next
+        </button>
+      </div>
+    </div>
+    <div v-show="questionIndex === quiz.questions.length">
+      <h2>
+      Викторина заверщена
+    </h2>
+      <p>
+        Всего очечей: {{ score() }} / {{ quiz.questions.length }}
+      </p>
+    </div>
+  </div>
+  
+  <!-- Load Vue script -->
+  <script src="https://vuejs.org/js/vue.js"></script>
+  <!-- On load, init Vue -->
+  <script>
+    window.onload=function(){
+      // Create a quiz object with a title and two questions.
+      // A question has one or more answer, and one or more is valid.
+      var quiz = {
+        title: 'Викторина',
+        questions: [
+          {
+            text: "Вопрос 1",
+            responses: [
+              {text: 'Не верный'}, 
+              {text: 'Верный ответ', correct: true}, 
+            ]
+          }, {
+            text: "Вопрос 2",
+            responses: [
+              {text: 'Не верный ответ'}, 
+              {text: 'Верный ответ', correct: true},
+              {text: 'Верный ответ', correct: true},  
+            ]
+          },{
+            text: "Вопрос 3",
+            responses: [
+              {text: 'Не верный'}, 
+              {text: 'Верный', correct: true}, 
+            ]
+          }, {
+            text: "Вопрос 4",
+            responses: [
+              {text: 'Совсем верный', correct: true}, 
+              {text: 'Совсем не верный'}, 
+            ]
+          } 
+        ]
+      };
+           
+
+
+      new Vue({
+        el: '#app',
+        data: {
+          quiz: quiz,
+          // Store current question index
+          questionIndex: 0,
+          // An array initialized with "false" values for each question
+          // It means: "did the user answered correctly to the question n?" "no".
+          userResponses: Array(quiz.questions.length).fill(false)
+        },
+        // The view will trigger these methods on click
+        methods: {
+         // Go to next question
+          next: function() {
+            this.questionIndex++;
+          },
+          // Go to previous question
+          prev: function() {
+            this.questionIndex--;
+          },
+          // Return "true" count in userResponses
+          score: function() {
+            return this.userResponses.filter(function(val) { return val }).length;
+          }
+        }
+      });
+    }    
+  </script>
+</body>
